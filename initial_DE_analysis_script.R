@@ -29,9 +29,28 @@ ddsdata<-DESeqDataSetFromTximport(countskallisto, colData =listgrasshopperssampl
 
 summary(ddsdata)
 str(ddsdata)
-
+### using DESEQ2 to analyse the data creating the object 
 ddsdatare<-DESeq(ddsdata)
+### using the result function to obtain the statistical values  
 ddsresults<-results(ddsdatare)
+### the results show the base mean where is possible to see average of the normalized count values, log2fold is possible to see how much gene expression have change and the adjusted p value that shows false discovery rate and using contrast to estimated the comparisons  
 ddsresults
 ddsresults <- results(ddsdatare, name="morph_G_vs_B")
+ddsresults <- results(ddsdatare, contrast=c("morph","G","B"))
+summary(ddsresults)
 resultsNames(ddsdatare)
+### using LFC to visualize and ranking the genes using the shrinkage  effect size using apeglm which improves the estimator
+library(apeglm)
+resLFC <- lfcShrink(ddsdatare, coef="morph_G_vs_B", type="apeglm")
+resLFC
+### creating a MA-plot to see the log2fod changes 
+plotMA(ddsresults, ylim=c(-5,5))
+plotMA(resLFC, ylim=c(-2,2))
+
+
+
+
+
+           
+                                
+
