@@ -32,7 +32,7 @@ str(ddsdata)
 ### using DESEQ2 to analyse the data creating the object 
 ddsdatare<-DESeq(ddsdata)
 ### using the result function to obtain the statistical values  
-ddsresults<-results(dds)
+ddsresults<-results(ddsdatare)
 ### the results show the base mean where is possible to see average of the normalized count values, ### 
 ### log2fold is possible to see how much gene expression have change and the adjusted p value that  ###
 ### shows false discovery rate and using contrast to estimated the comparisons                      ###
@@ -45,8 +45,9 @@ ddsresults <- results(dds, contrast=c("morph","G","B"))
 summary(ddsresults)
 
 ### The summary shows lots of transcripts with low counts. Can we remove them ?
-keep <- rowSums(counts(ddsdatare)) >= 10
-dds <- ddsdatare[keep,]
+### I used this function to reduce the low counts to 7% 
+keep <- rowSums(counts(ddsdatare)) >= 30
+ddsdatare <- ddsdatare[keep,]
 
 ### using LFC to visualize and ranking the genes using the shrinkage  effect size using apeglm which improves the estimator
 library(apeglm)
@@ -58,6 +59,8 @@ summary(resLFC)
 par(mfrow=c(2,1))
 plotMA(ddsresults, ylim=c(-10,10))
 plotMA(resLFC, ylim=c(-10,10))
+
+
 
 #### Next steps!!!!! #####
 #### Download the sequence and annotation files from dropbox, run THIS ONLY ONCE! ####
