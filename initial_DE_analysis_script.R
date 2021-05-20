@@ -32,7 +32,7 @@ str(ddsdata)
 ### using DESEQ2 to analyse the data creating the object 
 ddsdatare<-DESeq(ddsdata)
 ### using the result function to obtain the statistical values  
-ddsresults<-results(ddsdatare)
+ddsresults<-results(dds)
 ### the results show the base mean where is possible to see average of the normalized count values, ### 
 ### log2fold is possible to see how much gene expression have change and the adjusted p value that  ###
 ### shows false discovery rate and using contrast to estimated the comparisons                      ###
@@ -41,15 +41,18 @@ ddsresults
 ### In the case of continuous variables, use the name argument
 #ddsresults <- results(ddsdatare, name="morph_G_vs_B")
 ### Using contrast argument
-ddsresults <- results(ddsdatare, contrast=c("morph","G","B"))
+ddsresults <- results(dds, contrast=c("morph","G","B"))
 summary(ddsresults)
 
 ### The summary shows lots of transcripts with low counts. Can we remove them ?
+keep <- rowSums(counts(ddsdatare)) >= 10
+dds <- ddsdatare[keep,]
 
 ### using LFC to visualize and ranking the genes using the shrinkage  effect size using apeglm which improves the estimator
 library(apeglm)
-resLFC <- lfcShrink(ddsdatare, coef="morph_G_vs_B", type="apeglm")
+resLFC <- lfcShrink(dds, coef="morph_G_vs_B", type="apeglm")
 resLFC
+summary(resLFC)
 ### creating a MA-plot to see the log2fold changes 
 ### summary(resLFC) and summary(ddsresults) are conflicting! we need figure out where we are going wrong ###
 par(mfrow=c(2,1))
