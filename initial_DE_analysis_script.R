@@ -19,7 +19,7 @@ countskallisto<-tximport(files=datakallisto , type= "kallisto", txOut =TRUE, cou
 
 # sanity check to see if my column names and row names are OK, also if our data is read into R fine. 
 all(colnames(countskallisto$counts)==row.names(datakallisto))
-### Check files which have been read ###
+View(datakallisto)
 head(datakallisto)
 head(countskallisto)
 str(listgrasshopperssamples)
@@ -33,10 +33,9 @@ str(ddsdata)
 ddsdatare<-DESeq(ddsdata)
 ### using the result function to obtain the statistical values  
 ddsresults<-results(ddsdatare)
-### the results show the base mean where is possible to see average of the normalized count values, ### 
-### log2fold is possible to see how much gene expression have change and the adjusted p value that  ###
-### shows false discovery rate and using contrast to estimated the comparisons                      ###
+### the results show the base mean where is possible to see average of the normalized count values, log2fold is possible to see how much gene expression have change and the adjusted p value that shows false discovery rate and using contrast to estimated the comparisons  
 ddsresults
+<<<<<<< Updated upstream
 
 ### In the case of continuous variables, use the name argument
 #ddsresults <- results(ddsdatare, name="morph_G_vs_B")
@@ -49,11 +48,18 @@ summary(ddsresults)
 keep <- rowSums(counts(ddsdatare)) >= 30
 ddsdatare <- ddsdatare[keep,]
 
+=======
+ddsresults <- results(ddsdatare, name="morph_G_vs_B")
+ddsresults <- results(ddsdatare, contrast=c("morph","G","B"))
+summary(ddsresults)
+resultsNames(ddsdatare)
+>>>>>>> Stashed changes
 ### using LFC to visualize and ranking the genes using the shrinkage  effect size using apeglm which improves the estimator
 library(apeglm)
 resLFC <- lfcShrink(dds, coef="morph_G_vs_B", type="apeglm")
 resLFC
 summary(resLFC)
+<<<<<<< Updated upstream
 ### creating a MA-plot to see the log2fold changes 
 ### summary(resLFC) and summary(ddsresults) are conflicting! we need figure out where we are going wrong ###
 par(mfrow=c(2,1))
@@ -78,11 +84,13 @@ library(GenomicRanges)
 
 ### Import seqs and annotations
 Gsib_annotation<-import.gff3(con = "Gsib_transcriptome_draft3.gff3")
+=======
+### creating a MA-plot to see the log2fod changes 
+plotMA(ddsresults, ylim=c(-5,5))
+plotMA(resLFC, ylim=c(-2,2))
+>>>>>>> Stashed changes
 
-Gsib_sequences<-readDNAStringSet("Gsib_transcriptome_draft3_seqs.fasta")
 
-### Import annotations as dataframe
-Gsib_annotation_table<-readGFF("Gsib_trans_draft3_annotation_formatted.gff3")
 
 
 
