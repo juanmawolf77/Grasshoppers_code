@@ -41,20 +41,26 @@ ddsresults
 ### In the case of continuous variables, use the name argument
 #ddsresults <- results(ddsdatare, name="morph_G_vs_B")
 ### Using contrast argument
-ddsresults <- results(ddsdatare, contrast=c("morph","G","B"))
+ddsresults <- results(dds, contrast=c("morph","G","B"))
 summary(ddsresults)
 
 ### The summary shows lots of transcripts with low counts. Can we remove them ?
+### I used this function to reduce the low counts to 7% 
+keep <- rowSums(counts(ddsdatare)) >= 30
+ddsdatare <- ddsdatare[keep,]
 
 ### using LFC to visualize and ranking the genes using the shrinkage  effect size using apeglm which improves the estimator
 library(apeglm)
-resLFC <- lfcShrink(ddsdatare, coef="morph_G_vs_B", type="apeglm")
+resLFC <- lfcShrink(dds, coef="morph_G_vs_B", type="apeglm")
 resLFC
+summary(resLFC)
 ### creating a MA-plot to see the log2fold changes 
 ### summary(resLFC) and summary(ddsresults) are conflicting! we need figure out where we are going wrong ###
 par(mfrow=c(2,1))
 plotMA(ddsresults, ylim=c(-10,10))
 plotMA(resLFC, ylim=c(-10,10))
+
+
 
 #### Next steps!!!!! #####
 #### Download the sequence and annotation files from dropbox, run THIS ONLY ONCE! ####
@@ -65,9 +71,11 @@ download.file("https://www.dropbox.com/s/je2qi7iasg4vjzh/Gsib_trans_draft3_annot
 
 #### Read in the annotation file #####
 
-
+install.packages("Biostrings")
 library(Biostrings)
+install.packages("rtracklayer")
 library(rtracklayer)
+install.packages("GenomicRanges")
 library(GenomicRanges)
 
 ### Import seqs and annotations
