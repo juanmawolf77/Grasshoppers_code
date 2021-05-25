@@ -36,6 +36,7 @@ ddsresults<-results(ddsdatare)
 ### the results show the base mean where is possible to see average of the normalized count values, log2fold is possible to see how much gene expression have change and the adjusted p value that shows false discovery rate and using contrast to estimated the comparisons  
 ddsresults
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 
 ### In the case of continuous variables, use the name argument
 #ddsresults <- results(ddsdatare, name="morph_G_vs_B")
@@ -54,11 +55,18 @@ ddsresults <- results(ddsdatare, contrast=c("morph","G","B"))
 summary(ddsresults)
 resultsNames(ddsdatare)
 >>>>>>> Stashed changes
+=======
+ddsresults <- results(ddsdatare, name="morph_G_vs_B")
+ddsresults <- results(ddsdatare, contrast=c("morph","G","B"))
+summary(ddsresults)
+resultsNames(ddsdatare)
+>>>>>>> Stashed changes
 ### using LFC to visualize and ranking the genes using the shrinkage  effect size using apeglm which improves the estimator
 library(apeglm)
 resLFC <- lfcShrink(dds, coef="morph_G_vs_B", type="apeglm")
 resLFC
 summary(resLFC)
+<<<<<<< Updated upstream
 <<<<<<< Updated upstream
 ### creating a MA-plot to see the log2fold changes 
 ### summary(resLFC) and summary(ddsresults) are conflicting! we need figure out where we are going wrong ###
@@ -84,6 +92,11 @@ library(GenomicRanges)
 
 ### Import seqs and annotations
 Gsib_annotation<-import.gff3(con = "Gsib_transcriptome_draft3.gff3")
+=======
+### creating a MA-plot to see the log2fod changes 
+plotMA(ddsresults, ylim=c(-5,5))
+plotMA(resLFC, ylim=c(-2,2))
+>>>>>>> Stashed changes
 =======
 ### creating a MA-plot to see the log2fod changes 
 plotMA(ddsresults, ylim=c(-5,5))
