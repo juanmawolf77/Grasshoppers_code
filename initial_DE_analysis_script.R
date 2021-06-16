@@ -46,7 +46,7 @@ summary(ddsresults)
 
 ### The summary shows lots of transcripts with low counts. Can we remove them ?
 ### I used this function to reduce the low counts to 7% 
-keep <- rowSums(counts(ddsdatare)) >= 40
+keep <- rowSums(counts(ddsdatare)) >= 45
 ddsdatare <- ddsdatare[keep,]
 
 ### using LFC to visualize and ranking the genes using the shrinkage  effect size using apeglm which improves the estimator
