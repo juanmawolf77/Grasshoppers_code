@@ -41,12 +41,12 @@ ddsresults
 ### In the case of continuous variables, use the name argument
 #ddsresults <- results(ddsdatare, name="morph_G_vs_B")
 ### Using contrast argument
-ddsresults <- results(dds, contrast=c("morph","G","B"))
+ddsresults <- results(ddsdatare, contrast=c("morph","G","B"))
 summary(ddsresults)
 
 ### The summary shows lots of transcripts with low counts. Can we remove them ?
 ### I used this function to reduce the low counts to 7% 
-keep <- rowSums(counts(ddsdatare)) >= 30
+keep <- rowSums(counts(ddsdatare)) >= 40
 ddsdatare <- ddsdatare[keep,]
 
 ### using LFC to visualize and ranking the genes using the shrinkage  effect size using apeglm which improves the estimator
@@ -70,6 +70,8 @@ download.file("https://www.dropbox.com/s/kb5y5cyn7slazzf/good.Renamed_Gsib_trans
 download.file("https://www.dropbox.com/s/je2qi7iasg4vjzh/Gsib_trans_draft3_annotation_formatted.gff3?dl=1",destfile = "Gsib_transcriptome_draft3.gff3")
 
 #### Read in the annotation file #####
+
+##### i am having issues in this part i can not install the packages
 
 install.packages("Biostrings")
 library(Biostrings)
