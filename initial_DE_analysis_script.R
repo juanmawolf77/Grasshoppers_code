@@ -26,9 +26,15 @@ str(listgrasshopperssamples)
 
 ### creating a object to give to r the information about the design and the information of each sample
 ddsdata<-DESeqDataSetFromTximport(countskallisto, colData =listgrasshopperssamples, design= ~ morph)
-
+ddsdata
 summary(ddsdata)
 str(ddsdata)
+
+### The summary shows lots of transcripts with low counts. Can we remove them ?
+### I used this function to reduce the low counts to 7% 
+keep <- rowSums(counts(ddsdatare)) >= 10
+ddsdatare <- ddsdatare[keep,]
+
 ### using DESEQ2 to analyse the data creating the object 
 ddsdatare<-DESeq(ddsdata)
 ### using the result function to obtain the statistical values  
@@ -44,10 +50,6 @@ ddsresults
 ddsresults <- results(ddsdatare, contrast=c("morph","G","B"))
 summary(ddsresults)
 
-### The summary shows lots of transcripts with low counts. Can we remove them ?
-### I used this function to reduce the low counts to 7% 
-keep <- rowSums(counts(ddsdatare)) >= 45
-ddsdatare <- ddsdatare[keep,]
 
 ### using LFC to visualize and ranking the genes using the shrinkage  effect size using apeglm which improves the estimator
 library(apeglm)
