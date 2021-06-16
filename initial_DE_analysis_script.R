@@ -53,7 +53,7 @@ summary(ddsresults)
 
 ### using LFC to visualize and ranking the genes using the shrinkage  effect size using apeglm which improves the estimator
 library(apeglm)
-resLFC <- lfcShrink(dds, coef="morph_G_vs_B", type="apeglm")
+resLFC <- lfcShrink(ddsdatare, coef="morph_G_vs_B", type="apeglm")
 resLFC
 summary(resLFC)
 ### creating a MA-plot to see the log2fold changes 
@@ -74,12 +74,11 @@ download.file("https://www.dropbox.com/s/je2qi7iasg4vjzh/Gsib_trans_draft3_annot
 #### Read in the annotation file #####
 
 ##### i am having issues in this part i can not install the packages
-
-install.packages("Biostrings")
+BiocManager::install("Biostrings")
 library(Biostrings)
-install.packages("rtracklayer")
+BiocManager::install("rtracklayer")
 library(rtracklayer)
-install.packages("GenomicRanges")
+BiocManager::install("GenomicRanges")
 library(GenomicRanges)
 
 ### Import seqs and annotations
@@ -88,6 +87,8 @@ Gsib_annotation<-import.gff3(con = "Gsib_transcriptome_draft3.gff3")
 Gsib_sequences<-readDNAStringSet("Gsib_transcriptome_draft3_seqs.fasta")
 
 ### Import annotations as dataframe
+
+### it does not let me to import the  annotations
 Gsib_annotation_table<-readGFF("Gsib_trans_draft3_annotation_formatted.gff3")
 
 
