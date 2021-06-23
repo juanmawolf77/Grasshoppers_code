@@ -29,6 +29,7 @@ ddsdata<-DESeqDataSetFromTximport(countskallisto, colData =listgrasshopperssampl
 ddsdata
 summary(ddsdata)
 str(ddsdata)
+nrow(ddsdata)
 
 ### The summary shows lots of transcripts with low counts. Can we remove them ?
 ### I used this function to reduce the low counts to 7% 
@@ -61,7 +62,11 @@ summary(resLFC)
 par(mfrow=c(2,1))
 plotMA(ddsresults, ylim=c(-10,10))
 plotMA(resLFC, ylim=c(-10,10))
+DESeq2::plotMA(object = ddsresults, ylim = c(-5, 5))
+plotMA(ddsdatare)
 
+sum(ddsresults$padj < 0.1, na.rm=TRUE)
+print(ddsdata)
 
 
 #### Next steps!!!!! #####
