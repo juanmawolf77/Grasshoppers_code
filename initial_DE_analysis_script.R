@@ -96,8 +96,8 @@ Gsib_sequences<-readDNAStringSet("Gsib_transcriptome_draft3_seqs.fasta")
 ### it does not let me to import the  annotations
 Gsib_annotation_table<-readGFF("Gsib_trans_draft3_annotation_formatted.gff3")
 
-
-
+pairwiseAlignment(pattern = c("succeed", "precede"), subject = "supersede")
+pairwiseAlignment(pattern = c("succeed", "precede"), subject = "supersede", type = "global")
            
-                                
-
+data("targets")                               
+head("targets")
