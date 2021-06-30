@@ -59,14 +59,11 @@ resLFC
 summary(resLFC)
 ### creating a MA-plot to see the log2fold changes 
 ### summary(resLFC) and summary(ddsresults) are conflicting! we need figure out where we are going wrong ###
-par(mfrow=c(2,1))
-plotMA(ddsresults, ylim=c(-10,10))
+par(mfrow=c(4,1))
+plotMA(ddsresults, ylim=c(-5,5))
 plotMA(resLFC, ylim=c(-10,10))
-DESeq2::plotMA(object = ddsresults, ylim = c(-5, 5))
-plotMA(ddsdatare)
 
-sum(ddsresults$padj < 0.1, na.rm=TRUE)
-print(ddsdata)
+
 
 
 #### Next steps!!!!! #####
@@ -79,11 +76,11 @@ download.file("https://www.dropbox.com/s/je2qi7iasg4vjzh/Gsib_trans_draft3_annot
 #### Read in the annotation file #####
 
 ##### i am having issues in this part i can not install the packages
-BiocManager::install("Biostrings")
+
 library(Biostrings)
-BiocManager::install("rtracklayer")
+
 library(rtracklayer)
-BiocManager::install("GenomicRanges")
+
 library(GenomicRanges)
 
 ### Import seqs and annotations
