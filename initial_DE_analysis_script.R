@@ -33,11 +33,11 @@ nrow(ddsdata)
 
 ### The summary shows lots of transcripts with low counts. Can we remove them ?
 ### I used this function to reduce the low counts to 7% 
-keep <- rowSums(counts(ddsdatare)) >= 10
-ddsdatare <- ddsdatare[keep,]
+keep <- rowSums(counts(ddsdata)) >= 120
+ddsdatafil<- ddsdata[keep,]
 
 ### using DESEQ2 to analyse the data creating the object 
-ddsdatare<-DESeq(ddsdata)
+ddsdatare<-DESeq(ddsdatafil)
 ### using the result function to obtain the statistical values  
 ddsresults<-results(ddsdatare)
 ### the results show the base mean where is possible to see average of the normalized count values, ### 
@@ -59,9 +59,11 @@ resLFC
 summary(resLFC)
 ### creating a MA-plot to see the log2fold changes 
 ### summary(resLFC) and summary(ddsresults) are conflicting! we need figure out where we are going wrong ###
-par(mfrow=c(4,1))
-plotMA(ddsresults, ylim=c(-5,5))
-plotMA(resLFC, ylim=c(-10,10))
+par(mfrow=c(1,1))
+plotMA(ddsresults)
+plotMA(resLFC)
+
+
 
 
 
