@@ -50,18 +50,22 @@ ddsresults
 ### Using contrast argument
 ddsresults <- results(ddsdatare, contrast=c("morph","G","B"))
 summary(ddsresults)
-
-
+mcols(ddsresults, use.names=TRUE)
+#### Diagnostic plots dispersion and histogram
+plotDispEsts(ddsdatare, ylim = c(1e-6, 1e1) )
+hist( ddsresults$pvalue, breaks=20, col="green" )
 ### using LFC to visualize and ranking the genes using the shrinkage  effect size using apeglm which improves the estimator
 library(apeglm)
 resLFC <- lfcShrink(ddsdatare, coef="morph_G_vs_B", type="apeglm")
 resLFC
 summary(resLFC)
+mcols(resLFC, use.names=TRUE)
 ### creating a MA-plot to see the log2fold changes 
 ### summary(resLFC) and summary(ddsresults) are conflicting! we need figure out where we are going wrong ###
 par(mfrow=c(1,1))
 plotMA(ddsresults)
 plotMA(resLFC)
+
 
 
 
