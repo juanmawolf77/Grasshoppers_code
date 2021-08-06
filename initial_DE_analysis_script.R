@@ -50,6 +50,7 @@ ddsresults
 ### Using contrast argument
 ddsresults <- results(ddsdatare, contrast=c("morph","G","B"))
 summary(ddsresults)
+
 mcols(ddsresults, use.names=TRUE)
 #### Diagnostic plots dispersion and histogram
 plotDispEsts(ddsdatare, ylim = c(1e-6, 1e1) )
