@@ -60,15 +60,13 @@ str(ddsre)
 #ddsresults <- results(ddsdatare, name="morph_G_vs_B")
 ### Using contrast argument
 ddsre<- results(ddsdataresults, contrast=c("morph","G","B"))
-summary(ddsresults)
+summary(ddsre)
 
 ### visualization of all the genes
-nrow(as.data.frame(ddsresults))
-mcols(ddsresults, use.names=TRUE)
+nrow(as.data.frame(ddsre))
+mcols(ddsre, use.names=TRUE)
 #### Diagnostic plots dispersion and histogram and volcano plot
-BiocManager::install('EnhancedVolcano')
-install.packages("ggplot2")
-install.packages("ggrepel")
+
 library("ggrepel")
 library("ggplot2") 
 library("EnhancedVolcano")
@@ -78,12 +76,16 @@ EnhancedVolcano(ddsre,
                 lab = rownames(ddsre),
                 x = 'log2FoldChange',
                 y = 'pvalue')
+
 ### using LFC to visualize and ranking the genes using the shrinkage  effect size using apeglm which improves the estimator
 library(apeglm)
-resLFC <- lfcShrink(ddsdatare, coef="morph_G_vs_B", type="apeglm")
+resLFC <- lfcShrink(ddsdataresults, coef="morph_G_vs_B", type="apeglm")
 resLFC
 summary(resLFC)
-
+EnhancedVolcano(resLFC,
+                lab = rownames(resLFC),
+                x = 'log2FoldChange',
+                y = 'pvalue')
 
 mcols(resLFC, use.names=TRUE)
 ### creating a MA-plot to see the log2fold changes 
