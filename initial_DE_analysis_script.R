@@ -31,26 +31,47 @@ summary(ddsdata)
 str(ddsdata)
 nrow(ddsdata)
 
+
 ### The summary shows lots of transcripts with low counts. Can we remove them ?
 ### I used this function to reduce the low counts to 7% 
 keep <- rowSums(counts(ddsdata)) >= 120
 ddsdatafil<- ddsdata[keep,]
+ddsdatafil
 
 ### using DESEQ2 to analyse the data creating the object 
-ddsdatare<-DESeq(ddsdatafil)
+ddsdataresults<-DESeq(ddsdatafil)
+sizeFactors(ddsdataresults)
+estimateSizeFactors(ddsdataresults)
+colSums(counts(ddsdataresults))
+plotDispEsts(ddsdataresults)
+colSums(counts(ddsdataresults, normalized=T))
+
+BiocManager::install('EnhancedVolcano')
+install.packages("ggplot2")
+install.packages("ggrepel")
+library("ggrepel")
+library("ggplot2")
+library("EnhancedVolcano")
+
+EnhancedVolcano(ddsresults,
+                lab = rownames(ddsresults),
+                x = 'log2FoldChange',
+                y = 'pvalue')
 ### using the result function to obtain the statistical values  
-ddsresults<-results(ddsdatare)
+ddsresults<-results(ddsdataresults)
 ### the results show the base mean where is possible to see average of the normalized count values, ### 
 ### log2fold is possible to see how much gene expression have change and the adjusted p value that  ###
 ### shows false discovery rate and using contrast to estimated the comparisons                      ###
 ddsresults
-
+nrow(ddsresults)
+str(ddsresults)
 ### In the case of continuous variables, use the name argument
 #ddsresults <- results(ddsdatare, name="morph_G_vs_B")
 ### Using contrast argument
-ddsresults <- results(ddsdatare, contrast=c("morph","G","B"))
+ddsresults <- results(ddsdataresults, contrast=c("morph","G","B"))
 summary(ddsresults)
-
+### visualization of all the genes
+nrow(as.data.frame(ddsresults))
 mcols(ddsresults, use.names=TRUE)
 #### Diagnostic plots dispersion and histogram
 plotDispEsts(ddsdatare, ylim = c(1e-6, 1e1) )
@@ -60,17 +81,30 @@ library(apeglm)
 resLFC <- lfcShrink(ddsdatare, coef="morph_G_vs_B", type="apeglm")
 resLFC
 summary(resLFC)
+
+
 mcols(resLFC, use.names=TRUE)
 ### creating a MA-plot to see the log2fold changes 
 ### summary(resLFC) and summary(ddsresults) are conflicting! we need figure out where we are going wrong ###
 par(mfrow=c(1,1))
+pdf("MA_plot.pdf")plotMA(ddsresults)
+
+plotMA(resLFC) xl
+pdf("MA_plot.pdf")
 plotMA(ddsresults)
-plotMA(resLFC)
+dev.off()
 
 
 
+DESeq2::plotMA(ddsresults)
 
+library(ggplot2)
 
+ggplot()+
+  geom_point(data=as.data.frame(ddsresults),aes(x=log2FoldChange,y=-log10(padj)),col="grey80",alpha=0.5)+
+  geom_point(data=filter(as.data.frame(ddsresults),padj<0.05),aes(x=log2FoldChange,y=-log10(padj)),col="red",alpha=0.7)+
+  geom_hline(aes(yintercept=-log10(0.05)),alpha=0.5)+
+  theme_bw()
 
 
 #### Next steps!!!!! #####
@@ -100,8 +134,4 @@ Gsib_sequences<-readDNAStringSet("Gsib_transcriptome_draft3_seqs.fasta")
 ### it does not let me to import the  annotations
 Gsib_annotation_table<-readGFF("Gsib_trans_draft3_annotation_formatted.gff3")
 
-pairwiseAlignment(pattern = c("succeed", "precede"), subject = "supersede")
-pairwiseAlignment(pattern = c("succeed", "precede"), subject = "supersede", type = "global")
-           
-data("targets")                               
-head("targets")
+
