@@ -46,36 +46,38 @@ colSums(counts(ddsdataresults))
 plotDispEsts(ddsdataresults)
 colSums(counts(ddsdataresults, normalized=T))
 
+
+
+### using the result function to obtain the statistical values  
+ddsre<-results(ddsdataresults)
+### the results show the base mean where is possible to see average of the normalized count values, ### 
+### log2fold is possible to see how much gene expression have change and the adjusted p value that  ###
+### shows false discovery rate and using contrast to estimated the comparisons                      ###
+ddsre
+nrow(ddsre)
+str(ddsre)
+### In the case of continuous variables, use the name argument
+#ddsresults <- results(ddsdatare, name="morph_G_vs_B")
+### Using contrast argument
+ddsre<- results(ddsdataresults, contrast=c("morph","G","B"))
+summary(ddsresults)
+
+### visualization of all the genes
+nrow(as.data.frame(ddsresults))
+mcols(ddsresults, use.names=TRUE)
+#### Diagnostic plots dispersion and histogram and volcano plot
 BiocManager::install('EnhancedVolcano')
 install.packages("ggplot2")
 install.packages("ggrepel")
 library("ggrepel")
-library("ggplot2")
+library("ggplot2") 
 library("EnhancedVolcano")
-
-EnhancedVolcano(ddsresults,
-                lab = rownames(ddsresults),
-                x = 'log2FoldChange',
-                y = 'pvalue')
-### using the result function to obtain the statistical values  
-ddsresults<-results(ddsdataresults)
-### the results show the base mean where is possible to see average of the normalized count values, ### 
-### log2fold is possible to see how much gene expression have change and the adjusted p value that  ###
-### shows false discovery rate and using contrast to estimated the comparisons                      ###
-ddsresults
-nrow(ddsresults)
-str(ddsresults)
-### In the case of continuous variables, use the name argument
-#ddsresults <- results(ddsdatare, name="morph_G_vs_B")
-### Using contrast argument
-ddsresults <- results(ddsdataresults, contrast=c("morph","G","B"))
-summary(ddsresults)
-### visualization of all the genes
-nrow(as.data.frame(ddsresults))
-mcols(ddsresults, use.names=TRUE)
-#### Diagnostic plots dispersion and histogram
 plotDispEsts(ddsdatare, ylim = c(1e-6, 1e1) )
 hist( ddsresults$pvalue, breaks=20, col="green" )
+EnhancedVolcano(ddsre,
+                lab = rownames(ddsre),
+                x = 'log2FoldChange',
+                y = 'pvalue')
 ### using LFC to visualize and ranking the genes using the shrinkage  effect size using apeglm which improves the estimator
 library(apeglm)
 resLFC <- lfcShrink(ddsdatare, coef="morph_G_vs_B", type="apeglm")
