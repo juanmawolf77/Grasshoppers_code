@@ -1,14 +1,15 @@
 
+
 rm(list = ls())
 library("DESeq2")
-library("tximport")
+library("tximport")  
 
 
 ### Import kallisto pseudo-counts into memory 
 # Creating the vector for the files with a list
 datakallisto<-list.files("quants_kallisto", pattern = "abundance.tsv", full.names = T, recursive = T) 
 
-# readig the whole files using a anonymus fuction to then use tximport
+# readig the whole files using a anonymus fuction to then use tximport (OPTIONAL)
 transciptdatakallisto<-lapply(X=datakallisto, FUN = function(x)read.table(x,header = T))  
 
 # Read in sample meta-data design
@@ -17,8 +18,6 @@ listgrasshopperssamples<-read.table("RNAseq_DE_mapping_samples_list.txt", header
 # reading the count data with tximport
 countskallisto<-tximport(files=datakallisto , type= "kallisto", txOut =TRUE, countsFromAbundance= "lengthScaledTPM")
 
-# sanity check to see if my column names and row names are OK, also if our data is read into R fine. 
-all(colnames(countskallisto$counts)==row.names(datakallisto))
 ### Check files which have been read ###
 head(datakallisto)
 head(countskallisto)
@@ -31,21 +30,14 @@ summary(ddsdata)
 str(ddsdata)
 nrow(ddsdata)
 
-
-### The summary shows lots of transcripts with low counts. Can we remove them ?
-### I used this function to reduce the low counts to 7% 
+###  removing low counts 
 keep <- rowSums(counts(ddsdata)) >= 120
 ddsdatafil<- ddsdata[keep,]
 ddsdatafil
-
+keep
+summary(keep)
 ### using DESEQ2 to analyse the data creating the object 
 ddsdataresults<-DESeq(ddsdatafil)
-sizeFactors(ddsdataresults)
-estimateSizeFactors(ddsdataresults)
-colSums(counts(ddsdataresults))
-plotDispEsts(ddsdataresults)
-colSums(counts(ddsdataresults, normalized=T))
-
 
 
 ### using the result function to obtain the statistical values  
@@ -56,8 +48,7 @@ ddsre<-results(ddsdataresults)
 ddsre
 nrow(ddsre)
 str(ddsre)
-### In the case of continuous variables, use the name argument
-#ddsresults <- results(ddsdatare, name="morph_G_vs_B")
+
 ### Using contrast argument
 ddsre<- results(ddsdataresults, contrast=c("morph","G","B"))
 summary(ddsre)
@@ -66,50 +57,53 @@ summary(ddsre)
 nrow(as.data.frame(ddsre))
 mcols(ddsre, use.names=TRUE)
 #### Diagnostic plots dispersion and histogram and volcano plot
-
+#Volcanoplot
 library("ggrepel")
 library("ggplot2") 
 library("EnhancedVolcano")
-plotDispEsts(ddsdatare, ylim = c(1e-6, 1e1) )
-hist( ddsresults$pvalue, breaks=20, col="green" )
-EnhancedVolcano(ddsre,
-                lab = rownames(ddsre),
-                x = 'log2FoldChange',
-                y = 'pvalue')
+EnhancedVolcano(resLFC, 
+                lab = rownames(resLFC), 
+                x="log2FoldChange", 
+                y="padj", 
+                FCcutoff = 1.0, 
+                pCutoff =0.1,
+                pointSize = 1.5, 
+                labSize = 3.0, 
+                ylim = c(0,10), 
+                xlim = c(-10,10),
+                colAlpha=1)
+#Dispersionplot
+plotDispEsts(ddsdataresults)
 
-### using LFC to visualize and ranking the genes using the shrinkage  effect size using apeglm which improves the estimator
+
+
+###using LFC to visualize and ranking the genes using the shrinkage  effect size using apeglm which improves the estimator
 library(apeglm)
+BiocManager::install("apeglm")
 resLFC <- lfcShrink(ddsdataresults, coef="morph_G_vs_B", type="apeglm")
 resLFC
 summary(resLFC)
-EnhancedVolcano(resLFC,
-                lab = rownames(resLFC),
-                x = 'log2FoldChange',
-                y = 'pvalue')
-
-mcols(resLFC, use.names=TRUE)
 ### creating a MA-plot to see the log2fold changes 
+plotMA(ddsre, ylim = c(-20, 20))
 ### summary(resLFC) and summary(ddsresults) are conflicting! we need figure out where we are going wrong ###
 par(mfrow=c(1,1))
 pdf("MA_plot.pdf")plotMA(ddsresults)
 
-plotMA(resLFC) xl
-pdf("MA_plot.pdf")
-plotMA(ddsresults)
-dev.off()
-
-
-
-DESeq2::plotMA(ddsresults)
-
-library(ggplot2)
-
-ggplot()+
-  geom_point(data=as.data.frame(ddsresults),aes(x=log2FoldChange,y=-log10(padj)),col="grey80",alpha=0.5)+
-  geom_point(data=filter(as.data.frame(ddsresults),padj<0.05),aes(x=log2FoldChange,y=-log10(padj)),col="red",alpha=0.7)+
-  geom_hline(aes(yintercept=-log10(0.05)),alpha=0.5)+
-  theme_bw()
-
+############### crateing a pheatmap 
+library(pheatmap)
+genes <- order(resLFC$log2FoldChange, decreasing=TRUE)[1:20] ############### selecting 20 genes with the largest postiive logfold change
+############### plotting the pheatmap
+pheatmap(assay(vsd)[genes, ], cluster_rows=TRUE, show_rownames=TRUE,
+         cluster_cols=FALSE)
+############### normalizing the data for the pheatmap
+vsd <- vst(ddsdataresults)
+library("genefilter")
+topVarGenes <- head(order(rowVars(assay(vsd)), decreasing = TRUE), 24)
+mat  <- assay(vsd)[ topVarGenes, ]
+mat  <- mat - rowMeans(mat)
+anno <- as.data.frame(colData(vsd)[, c("morph","sex")])
+pheatmap(mat, annotation_col = anno)
+vsd
 
 #### Next steps!!!!! #####
 #### Download the sequence and annotation files from dropbox, run THIS ONLY ONCE! ####
@@ -126,16 +120,20 @@ library(Biostrings)
 
 library(rtracklayer)
 
+
+
 library(GenomicRanges)
 
 ### Import seqs and annotations
 Gsib_annotation<-import.gff3(con = "Gsib_transcriptome_draft3.gff3")
 
 Gsib_sequences<-readDNAStringSet("Gsib_transcriptome_draft3_seqs.fasta")
+Gsib_sequences
 
 ### Import annotations as dataframe
 
 ### it does not let me to import the  annotations
+
 Gsib_annotation_table<-readGFF("Gsib_trans_draft3_annotation_formatted.gff3")
 
 
