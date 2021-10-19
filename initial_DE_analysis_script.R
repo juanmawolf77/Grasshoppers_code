@@ -9,8 +9,6 @@ library("tximport")
 # Creating the vector for the files with a list
 datakallisto<-list.files("quants_kallisto", pattern = "abundance.tsv", full.names = T, recursive = T) 
 
-# readig the whole files using a anonymus fuction to then use tximport (OPTIONAL)
-transciptdatakallisto<-lapply(X=datakallisto, FUN = function(x)read.table(x,header = T))  
 
 # Read in sample meta-data design
 listgrasshopperssamples<-read.table("RNAseq_DE_mapping_samples_list.txt", header = TRUE)
@@ -36,6 +34,7 @@ ddsdatafil<- ddsdata[keep,]
 ddsdatafil
 keep
 summary(keep)
+
 ### using DESEQ2 to analyse the data creating the object 
 ddsdataresults<-DESeq(ddsdatafil)
 
@@ -48,21 +47,29 @@ ddsre<-results(ddsdataresults)
 ddsre
 nrow(ddsre)
 str(ddsre)
+summary(ddsre)
+
 
 ### Using contrast argument
 ddsre<- results(ddsdataresults, contrast=c("morph","G","B"))
+
 summary(ddsre)
 
 ### visualization of all the genes
 nrow(as.data.frame(ddsre))
 mcols(ddsre, use.names=TRUE)
-#### Diagnostic plots dispersion and histogram and volcano plot
+
+topGene <- rownames(ddsre)[which.min(ddsre$padj)]
+plotCounts(ddsdataresults, gene = topGene, intgroup=c("morph"))
+
+
+#### Diagnostic plots dispersion nd volcano plot
 #Volcanoplot
 library("ggrepel")
 library("ggplot2") 
 library("EnhancedVolcano")
-EnhancedVolcano(resLFC, 
-                lab = rownames(resLFC), 
+EnhancedVolcano(ddsre, 
+                lab = rownames(ddsre), 
                 x="log2FoldChange", 
                 y="padj", 
                 FCcutoff = 1.0, 
@@ -72,22 +79,27 @@ EnhancedVolcano(resLFC,
                 ylim = c(0,10), 
                 xlim = c(-10,10),
                 colAlpha=1)
+
+
 #Dispersionplot
 plotDispEsts(ddsdataresults)
 
 
 
+
 ###using LFC to visualize and ranking the genes using the shrinkage  effect size using apeglm which improves the estimator
 library(apeglm)
-BiocManager::install("apeglm")
 resLFC <- lfcShrink(ddsdataresults, coef="morph_G_vs_B", type="apeglm")
 resLFC
 summary(resLFC)
 ### creating a MA-plot to see the log2fold changes 
-plotMA(ddsre, ylim = c(-20, 20))
+plotMA(resLFC, ylim = c(-15, 15))
 ### summary(resLFC) and summary(ddsresults) are conflicting! we need figure out where we are going wrong ###
 par(mfrow=c(1,1))
 pdf("MA_plot.pdf")plotMA(ddsresults)
+
+
+
 
 ############### crateing a pheatmap 
 library(pheatmap)
@@ -103,7 +115,14 @@ mat  <- assay(vsd)[ topVarGenes, ]
 mat  <- mat - rowMeans(mat)
 anno <- as.data.frame(colData(vsd)[, c("morph","sex")])
 pheatmap(mat, annotation_col = anno)
-vsd
+
+
+
+
+
+
+
+
 
 #### Next steps!!!!! #####
 #### Download the sequence and annotation files from dropbox, run THIS ONLY ONCE! ####
@@ -111,29 +130,26 @@ vsd
 
 download.file("https://www.dropbox.com/s/kb5y5cyn7slazzf/good.Renamed_Gsib_trans_draft3_c95.fasta?dl=1",destfile = "Gsib_transcriptome_draft3_seqs.fasta")
 download.file("https://www.dropbox.com/s/je2qi7iasg4vjzh/Gsib_trans_draft3_annotation_formatted.gff3?dl=1",destfile = "Gsib_transcriptome_draft3.gff3")
-
+download.file("https://www.dropbox.com/s/q5apm1nupwzrps2/Gsib_transcriptome_draft3.gff3?dl=0",destfile = "Gsib_trans_draft3_annotation_formatted.gff3")
 #### Read in the annotation file #####
 
 ##### i am having issues in this part i can not install the packages
 
 library(Biostrings)
-
 library(rtracklayer)
-
-
-
 library(GenomicRanges)
 
 ### Import seqs and annotations
 Gsib_annotation<-import.gff3(con = "Gsib_transcriptome_draft3.gff3")
+Gsib_annotation
 
 Gsib_sequences<-readDNAStringSet("Gsib_transcriptome_draft3_seqs.fasta")
 Gsib_sequences
-
+length(Gsib_sequences)
+sample(Gsib_sequences)
 ### Import annotations as dataframe
 
-### it does not let me to import the  annotations
-
-Gsib_annotation_table<-readGFF("Gsib_trans_draft3_annotation_formatted.gff3")
+Gsib_annotation_table<-readGFF("Gsib_transcriptome_draft3.gff3")
+Gsib_annotation_table
 
 
