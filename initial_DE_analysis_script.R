@@ -79,11 +79,14 @@ EnhancedVolcano(ddsre,
                 xlim = c(-10,10),
                 colAlpha=1)
 
-
-
-
-
-
+library("ggpubr")
+maplot = ggmaplot(ddsre, fdr = 0.01, fc = 1, size = 1,
+                  palette = c("#e55c30", "#84206b", "#f6d746"),
+                  genenames = as.vector(row.names(ddsre)),
+                  legend="top", top = 15,font.label = c("bold", 11),
+                  label.rectangle = TRUE, font.legend = c("bold",12), font.main = "bold",
+                  xlab = "Log2 Mean Expression",  ylab="Log2 FC")
+show(maplot)
 
 #Dispersionplot
 plotDispEsts(ddsdataresults)
@@ -98,10 +101,26 @@ resLFC
 summary(resLFC)
 ### creating a MA-plot to see the log2fold changes 
 plotMA(resLFC, ylim = c(-15, 15))
-### summary(resLFC) and summary(ddsresults) 
+plotMA(ddsre, ylim = c(-15, 15))
+
+###  
 par(mfrow=c(1,1))
 pdf("MA_plot.pdf")plotMA(ddsresults)
-############### normalizing the data for the pheatmap
+
+
+############ nice MAplot 
+
+library("ggpubr")
+maplot = ggmaplot(ddsre, fdr = 0.01, fc = 1, size = 1,
+                  palette = c("#e55c30", "#84206b", "#f6d746"),
+                  genenames = as.vector(row.names(ddsre)),
+                  legend="top", top = 15,font.label = c("bold", 11),
+                  label.rectangle = TRUE, font.legend = c("bold",12), font.main = "bold",
+                  xlab = "Log2 Mean Expression",  ylab="Log2 FC")
+show(maplot)
+
+
+############### normalizing the data for the pheatmap with the vst method
 vsd <- vst(ddsdataresults)
 
 
