@@ -59,8 +59,7 @@ summary(ddsre)
 nrow(as.data.frame(ddsre))
 mcols(ddsre, use.names=TRUE)
 
-topGene <- rownames(ddsre)[which.min(ddsre$padj)]
-plotCounts(ddsdataresults, gene = topGene, intgroup=c("morph"))
+
 
 
 #### Diagnostic plots dispersion nd volcano plot
@@ -93,13 +92,13 @@ plotDispEsts(ddsdataresults)
 
 
 ###using LFC to visualize and ranking the genes using the shrinkage  effect size using apeglm which improves the estimator
-library(apeglm)
+library("apeglm")
 resLFC <- lfcShrink(ddsdataresults, coef="morph_G_vs_B", type="apeglm")
 resLFC
 summary(resLFC)
 ### creating a MA-plot to see the log2fold changes 
 plotMA(resLFC, ylim = c(-15, 15))
-### summary(resLFC) and summary(ddsresults) are conflicting! we need figure out where we are going wrong ###
+### summary(resLFC) and summary(ddsresults) 
 par(mfrow=c(1,1))
 pdf("MA_plot.pdf")plotMA(ddsresults)
 ############### normalizing the data for the pheatmap
@@ -113,13 +112,21 @@ genes <- order(resLFC$log2FoldChange, decreasing=TRUE)[1:20] ############### sel
 ############### plotting the pheatmap
 pheatmap(assay(vsd)[genes, ], cluster_rows=TRUE, show_rownames=TRUE,
          cluster_cols=FALSE)
-
+############### plotting the pheatmap
 library("genefilter")
 topVarGenes <- head(order(rowVars(assay(vsd)), decreasing = TRUE), 24)
 mat  <- assay(vsd)[ topVarGenes, ]
 mat  <- mat - rowMeans(mat)
 anno <- as.data.frame(colData(vsd)[, c("morph","sex")])
 pheatmap(mat, annotation_col = anno)
+
+
+############### the most significant gene is the transcript_84434
+topGene <- rownames(ddsre)[which.min(ddsre$padj)]
+plotCounts(ddsdataresults, gene = topGene, intgroup=c("morph"))
+
+
+
 
 
 
@@ -175,9 +182,19 @@ length(Gsib_sequences)
 sample(Gsib_sequences)
 ### Import annotations as dataframe
 
-Gsib_annotation_table<-getGFF("Gsib_transcriptome_draft3.gff3")
-Gsib_annotation_table
+Gsib_annotation_table<-readGFF("Gsib_transcriptome_draft3.gff3")
 
+
+GFFcolnames()
+GFFcolnames(GFF1=TRUE)
+head(Gsib_annotation_table)
+
+
+
+my_tags <- c("ID", "Parent", "Name", "Dbxref", "geneID")
+df1 <- readGFF(Gsib_annotation_table, tags=my_tags)
+
+head(df1)
 
 library(BUSpaRse)
 
