@@ -123,26 +123,27 @@ pheatmap(mat, annotation_col = anno)
 
 
 
-####### ANNOTATING RESULTS
+####### Annotation result making the list of the most expressed genes  
 
 library("AnnotationDbi")
 
-####### 100 list  with reLFC
+####### 100 list of most expressed genes with reLFC
 
 resOrdered <- resLFC[order(resLFC$pvalue),]
 head(resOrdered)
 
 resOrderedDF <- as.data.frame(resOrdered)[1:100, ]
 resOrderedDF
-write.csv(resOrderedDF, file = "results.csv")
+write.csv(resOrderedDF, file = "resultsLFC.csv")
 
-####### 100 list  with ddsre
+####### 100 list  of most expressed genes with ddsre
 resOrdered2 <- ddsre[order(ddsre$pvalue),]
 head(resOrdered2)
 
 resOrderedDF2 <- as.data.frame(resOrdered2)[1:100, ]
 resOrderedDF2
-write.csv(resOrderedDF2, file = "results.csv")
+write.csv(resOrderedDF2, file = "resultsddsre.csv")
+
 
 
 
