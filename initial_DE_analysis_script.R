@@ -76,9 +76,14 @@ EnhancedVolcano(ddsre,
                 pCutoff =0.1,
                 pointSize = 1.5, 
                 labSize = 3.0, 
-                ylim = c(0,10), 
+                ylim = c(0,15), 
                 xlim = c(-10,10),
                 colAlpha=1)
+
+
+
+
+
 
 
 #Dispersionplot
@@ -97,7 +102,8 @@ plotMA(resLFC, ylim = c(-15, 15))
 ### summary(resLFC) and summary(ddsresults) are conflicting! we need figure out where we are going wrong ###
 par(mfrow=c(1,1))
 pdf("MA_plot.pdf")plotMA(ddsresults)
-
+############### normalizing the data for the pheatmap
+vsd <- vst(ddsdataresults)
 
 
 
@@ -107,8 +113,7 @@ genes <- order(resLFC$log2FoldChange, decreasing=TRUE)[1:20] ############### sel
 ############### plotting the pheatmap
 pheatmap(assay(vsd)[genes, ], cluster_rows=TRUE, show_rownames=TRUE,
          cluster_cols=FALSE)
-############### normalizing the data for the pheatmap
-vsd <- vst(ddsdataresults)
+
 library("genefilter")
 topVarGenes <- head(order(rowVars(assay(vsd)), decreasing = TRUE), 24)
 mat  <- assay(vsd)[ topVarGenes, ]
@@ -118,8 +123,26 @@ pheatmap(mat, annotation_col = anno)
 
 
 
+####### ANNOTATING RESULTS
 
+library("AnnotationDbi")
 
+####### 100 list  with reLFC
+
+resOrdered <- resLFC[order(resLFC$pvalue),]
+head(resOrdered)
+
+resOrderedDF <- as.data.frame(resOrdered)[1:100, ]
+resOrderedDF
+write.csv(resOrderedDF, file = "results.csv")
+
+####### 100 list  with ddsre
+resOrdered2 <- ddsre[order(ddsre$pvalue),]
+head(resOrdered2)
+
+resOrderedDF2 <- as.data.frame(resOrdered2)[1:100, ]
+resOrderedDF2
+write.csv(resOrderedDF2, file = "results.csv")
 
 
 
