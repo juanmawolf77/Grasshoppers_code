@@ -163,6 +163,8 @@ library(Biostrings)
 library(rtracklayer)
 library(GenomicRanges)
 
+
+
 ### Import seqs and annotations
 Gsib_annotation<-import.gff3(con = "Gsib_transcriptome_draft3.gff3")
 Gsib_annotation
@@ -173,7 +175,32 @@ length(Gsib_sequences)
 sample(Gsib_sequences)
 ### Import annotations as dataframe
 
-Gsib_annotation_table<-readGFF("Gsib_transcriptome_draft3.gff3")
+Gsib_annotation_table<-getGFF("Gsib_transcriptome_draft3.gff3")
 Gsib_annotation_table
 
 
+library(BUSpaRse)
+
+
+tr2g_gff3(
+  Gsib_annotation,
+  Genome = Gsib_sequences,
+  get_transcriptome = TRUE,
+  out_path = ".",
+  write_tr2g = TRUE,
+  transcript_id = "transcript_id",
+  gene_id = "gene_id",
+  gene_name = "Name",
+  transcript_version = "version",
+  gene_version = "version",
+  version_sep = ".",
+  transcript_biotype_col = "biotype",
+  gene_biotype_col = "biotype",
+  transcript_biotype_use = "all",
+  gene_biotype_use = "all",
+  chrs_only = TRUE,
+  compress_fa = FALSE,
+  save_filtered_gff = TRUE,
+  overwrite = FALSE,
+  source = c("ensembl", "refseq")
+)
