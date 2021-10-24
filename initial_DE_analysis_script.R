@@ -102,22 +102,28 @@ summary(resLFC)
 ### creating a MA-plot to see the log2fold changes 
 plotMA(resLFC, ylim = c(-15, 15))
 plotMA(ddsre, ylim = c(-15, 15))
-
-###  
-par(mfrow=c(1,1))
-pdf("MA_plot.pdf")plotMA(ddsresults)
-
-
-############ nice MAplot 
-
-library("ggpubr")
-maplot = ggmaplot(ddsre, fdr = 0.01, fc = 1, size = 1,
+maplot = ggmaplot(resLFC, fdr = 0.01, fc = 1, size = 1,
                   palette = c("#e55c30", "#84206b", "#f6d746"),
-                  genenames = as.vector(row.names(ddsre)),
+                  genenames = as.vector(row.names(resLFC)),
                   legend="top", top = 15,font.label = c("bold", 11),
                   label.rectangle = TRUE, font.legend = c("bold",12), font.main = "bold",
                   xlab = "Log2 Mean Expression",  ylab="Log2 FC")
 show(maplot)
+###  
+EnhancedVolcano(resLFC, 
+                lab = rownames(resLFC), 
+                x="log2FoldChange", 
+                y="padj", 
+                FCcutoff = 1.0, 
+                pCutoff =0.1,
+                pointSize = 1.5, 
+                labSize = 3.0, 
+                ylim = c(0,15), 
+                xlim = c(-10,10),
+                colAlpha=1)
+
+
+
 
 
 ############### normalizing the data for the pheatmap with the vst method
