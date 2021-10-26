@@ -154,7 +154,6 @@ plotCounts(ddsdataresults, gene = topGene, intgroup=c("morph"))
 
 
 
-
 ####### Annotation result making the list of the most expressed genes  
 
 library("AnnotationDbi")
@@ -214,35 +213,11 @@ GFFcolnames()
 GFFcolnames(GFF1=TRUE)
 head(Gsib_annotation_table)
 
+seqinfo(Gsib_annotation)
 
-
-my_tags <- c("ID", "Parent", "Name", "Dbxref", "geneID")
-df1 <- readGFF(Gsib_annotation_table, tags=my_tags)
-
-head(df1)
 
 library(BUSpaRse)
 
 
-tr2g_gff3(
-  Gsib_annotation,
-  Genome = Gsib_sequences,
-  get_transcriptome = TRUE,
-  out_path = ".",
-  write_tr2g = TRUE,
-  transcript_id = "transcript_id",
-  gene_id = "gene_id",
-  gene_name = "Name",
-  transcript_version = "version",
-  gene_version = "version",
-  version_sep = ".",
-  transcript_biotype_col = "biotype",
-  gene_biotype_col = "biotype",
-  transcript_biotype_use = "all",
-  gene_biotype_use = "all",
-  chrs_only = TRUE,
-  compress_fa = FALSE,
-  save_filtered_gff = TRUE,
-  overwrite = FALSE,
-  source = c("ensembl", "refseq")
-)
+
+
