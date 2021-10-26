@@ -176,10 +176,7 @@ resOrderedDF2
 write.csv(resOrderedDF2, file = "resultsddsre.csv")
 
 
-resSigind = ddsre[ which(ddsre$padj < 0.05 & ddsre$log2FoldChange > 0), ]
-resSigrep = ddsre[ which(ddsre$padj < 0.05 & ddsre$log2FoldChange < 0), ]
-resSig = rbind(resSigind, resSigrep)
-rownames(resSigind)
+
 
 
 #### Next steps!!!!! #####
@@ -191,7 +188,7 @@ download.file("https://www.dropbox.com/s/je2qi7iasg4vjzh/Gsib_trans_draft3_annot
 download.file("https://www.dropbox.com/s/q5apm1nupwzrps2/Gsib_transcriptome_draft3.gff3?dl=0",destfile = "Gsib_trans_draft3_annotation_formatted.gff3")
 #### Read in the annotation file #####
 
-##### i am having issues in this part i can not install the packages
+##### 
 
 library(Biostrings)
 library(rtracklayer)
