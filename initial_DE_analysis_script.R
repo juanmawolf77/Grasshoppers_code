@@ -36,11 +36,11 @@ keep
 summary(keep)
 
 ### using DESEQ2 to analyse the data creating the object 
-ddsdataresults<-DESeq(ddsdatafil)
+ddsdataresults<-DESeq(ddsdatafil, parallel = TRUE)
 
 
 ### using the result function to obtain the statistical values  
-ddsre<-results(ddsdataresults)
+ddsre<-results(ddsdataresults, parallel = TRUE)
 ### the results show the base mean where is possible to see average of the normalized count values, ### 
 ### log2fold is possible to see how much gene expression have change and the adjusted p value that  ###
 ### shows false discovery rate and using contrast to estimated the comparisons                      ###
@@ -67,6 +67,7 @@ mcols(ddsre, use.names=TRUE)
 library("ggrepel")
 library("ggplot2") 
 library("EnhancedVolcano")
+pdf("kallisto_est_Enhanced_VolcanoPlot_1.pdf", height = 9, width = 16)
 EnhancedVolcano(ddsre, 
                 lab = rownames(ddsre), 
                 x="log2FoldChange", 
@@ -75,11 +76,14 @@ EnhancedVolcano(ddsre,
                 pCutoff =0.1,
                 pointSize = 1.5, 
                 labSize = 3.0, 
-                ylim = c(0,15), 
-                xlim = c(-10,10),
+                ylim = c(0,10), 
+                xlim = c(-7.5,7.5),
                 colAlpha=1)
+dev.off()
+
 
 library("ggpubr")
+png("Kallisto_maplot_Log2_MeanExp_vs_Log2FC.png", width = 1600, height = 1200)
 maplot = ggmaplot(ddsre, fdr = 0.01, fc = 1, size = 1,
                   palette = c("#e55c30", "#84206b", "#f6d746"),
                   genenames = as.vector(row.names(ddsre)),
@@ -87,8 +91,10 @@ maplot = ggmaplot(ddsre, fdr = 0.01, fc = 1, size = 1,
                   label.rectangle = TRUE, font.legend = c("bold",12), font.main = "bold",
                   xlab = "Log2 Mean Expression",  ylab="Log2 FC")
 show(maplot)
+dev.off()
 
 #Dispersionplot
+### Plot this DispEst plot into a png or pdf for presentation/publication
 plotDispEsts(ddsdataresults)
 
 
@@ -96,7 +102,7 @@ plotDispEsts(ddsdataresults)
 
 ###using LFC to visualize and ranking the genes using the shrinkage  effect size using apeglm which improves the estimator
 library("apeglm")
-resLFC <- lfcShrink(ddsdataresults, coef="morph_G_vs_B", type="apeglm")
+resLFC <- lfcShrink(ddsdataresults, coef="morph_G_vs_B", type="apeglm", parallel = TRUE)
 resLFC
 summary(resLFC)
 ### creating a MA-plot to see the log2fold changes 
@@ -145,14 +151,13 @@ mat  <- mat - rowMeans(mat)
 anno <- as.data.frame(colData(vsd)[, c("morph","sex")])
 pheatmap(mat, annotation_col = anno)
 
-
 ############### the most significant gene is the transcript_84434
 topGene <- rownames(ddsre)[which.min(ddsre$padj)]
 plotCounts(ddsdataresults, gene = topGene, intgroup=c("morph"))
 
-
-
-
+##### Loop this to plot all 20 top genes, and make a panel for the presentation ####
+top20Genes<-rownames(ddsre)[order(ddsre$padj)[1:20]]
+plotCounts(ddsdataresults, gene = top20Genes[2], intgroup = c("morph"))
 
 ####### Annotation result making the list of the most expressed genes  
 
@@ -160,7 +165,7 @@ library("AnnotationDbi")
 
 ####### 100 list of most expressed genes with reLFC
 
-resOrdered <- resLFC[order(resLFC$pvalue),]
+resOrdered <- resLFC[order(resLFC$padj),]
 head(resOrdered)
 
 resOrderedDF <- as.data.frame(resOrdered)[1:100, ]
@@ -168,7 +173,7 @@ resOrderedDF
 write.csv(resOrderedDF, file = "resultsLFC.csv")
 
 ####### 100 list  of most expressed genes with ddsre
-resOrdered2 <- ddsre[order(ddsre$pvalue),]
+resOrdered2 <- ddsre[order(ddsre$padj),]
 head(resOrdered2)
 
 resOrderedDF2 <- as.data.frame(resOrdered2)[1:100, ]
@@ -200,18 +205,27 @@ library(GenomicRanges)
 
 
 ### Import seqs and annotations
+### Create a GRanges object from gff3 file import (of the transcriptome) #####
 Gsib_annotation<-import.gff3(con = "Gsib_transcriptome_draft3.gff3")
 Gsib_annotation
+###
 
+### Read transcriptome sequences into R ###
 Gsib_sequences<-readDNAStringSet("Gsib_transcriptome_draft3_seqs.fasta")
 Gsib_sequences
-length(Gsib_sequences)
-sample(Gsib_sequences)
 ### Import annotations as dataframe
-
+### Using brute force to import a GFF3 file into a dataframe, risky, but this is quick and dirty ###
 Gsib_annotation_table<-readGFF("Gsib_transcriptome_draft3.gff3")
 
+### Get names of all transcripts ###
+names(Gsib_sequences)
 
+
+
+###### Write FASTA file ####
+writeXStringSet(your_XStringSet,"your_filename",format="fasta" )
+
+####
 GFFcolnames()
 GFFcolnames(GFF1=TRUE)
 head(Gsib_annotation_table)
