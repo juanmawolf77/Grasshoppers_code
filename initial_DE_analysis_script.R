@@ -176,7 +176,10 @@ resOrderedDF2
 write.csv(resOrderedDF2, file = "resultsddsre.csv")
 
 
-
+resSigind = ddsre[ which(ddsre$padj < 0.05 & ddsre$log2FoldChange > 0), ]
+resSigrep = ddsre[ which(ddsre$padj < 0.05 & ddsre$log2FoldChange < 0), ]
+resSig = rbind(resSigind, resSigrep)
+rownames(resSigind)
 
 
 #### Next steps!!!!! #####
@@ -216,7 +219,6 @@ head(Gsib_annotation_table)
 seqinfo(Gsib_annotation)
 
 
-library(BUSpaRse)
 
 
 
