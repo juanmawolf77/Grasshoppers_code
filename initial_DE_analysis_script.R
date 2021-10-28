@@ -220,12 +220,10 @@ names(Gsib_sequences)
 
 
 ###### Write FASTA file ####
-writeXStringSet(your_XStringSet,"your_filename",format="fasta")
+writeXStringSet(Gsib_sequences,"your_filename",format="fasta")
+Gsib_sequences
 
-####
-GFFcolnames()
-GFFcolnames(GFF1=TRUE)
-head(Gsib_annotation_table)
+
 
 
 ###### using G ranges 
@@ -250,3 +248,10 @@ elementMetadata(Gsib_annotation)
 
 seqinfo(Gsib_annotation)
 seqlevels(Gsib_annotation)
+
+
+
+
+
+
+
