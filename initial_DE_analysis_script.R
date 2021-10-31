@@ -216,7 +216,7 @@ Gsib_annotation_table<-readGFF("Gsib_transcriptome_draft3.gff3")
 
 ### Get names of all transcripts ###
 names(Gsib_sequences)
-
+seqlevels(Gsib_sequences)
 
 
 ###### Write FASTA file ####
@@ -226,32 +226,25 @@ Gsib_sequences
 
 
 
-###### using G ranges 
+
+###### getting info from annotattion using Genomic ranges
+
+
+
+
 seqnames(Gsib_annotation)
-ranges(Gsib_annotation)
-strand(Gsib_annotation)
-granges(Gsib_annotation)
-mcols(Gsib_annotation)$score
-
-
-
-
-
-
-names(Gsib_annotation)
 length(Gsib_annotation)
 range(Gsib_annotation)
 values(Gsib_annotation)
 
 elementMetadata(Gsib_annotation)
 
-
+strand(Gsib_annotation)
 seqinfo(Gsib_annotation)
 seqlevels(Gsib_annotation)
 
 
+seqlengths(Gsib_sequences)
 
-
-
-
+Gsib_annotation[IRanges(start=c(2,7), end=c(3,9))]
 
