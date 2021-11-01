@@ -229,22 +229,23 @@ Gsib_sequences
 
 ###### getting info from annotattion using Genomic ranges
 
-
-
+###### basic granges list commands
 
 seqnames(Gsib_annotation)
+ranges(Gsib_annotation)
+strand(Gsib_annotation)
 length(Gsib_annotation)
-range(Gsib_annotation)
-values(Gsib_annotation)
+names(Gsib_annotation)
+seqlengths(Gsib_annotation)
+elementNROWS(Gsib_annotation)
+mcols(Gsib_annotation)
+coverage(Gsib_annotation)
+
+
+
+
 
 elementMetadata(Gsib_annotation)
-
-strand(Gsib_annotation)
-seqinfo(Gsib_annotation)
-seqlevels(Gsib_annotation)
-
-
-seqlengths(Gsib_sequences)
 
 Gsib_annotation[IRanges(start=c(2,7), end=c(3,9))]
 
