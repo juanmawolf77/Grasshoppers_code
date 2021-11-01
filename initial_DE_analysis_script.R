@@ -235,17 +235,22 @@ seqnames(Gsib_annotation)
 ranges(Gsib_annotation)
 strand(Gsib_annotation)
 length(Gsib_annotation)
-names(Gsib_annotation)
+granges(Gsib_annotation)
+names(Gsib_sequences)
 seqlengths(Gsib_annotation)
 elementNROWS(Gsib_annotation)
-mcols(Gsib_annotation)
+mcols(Gsib_annotation) ###### Annotation cordinates can be extracted with mcols
+mcols(Gsib_annotation)$score
 coverage(Gsib_annotation)
 
 
-
+table(seqnames(Gsib_annotation))
 
 
 elementMetadata(Gsib_annotation)
 
 Gsib_annotation[IRanges(start=c(2,7), end=c(3,9))]
+
+
+
 
