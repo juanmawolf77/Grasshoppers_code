@@ -158,7 +158,9 @@ plotCounts(ddsdataresults, gene = topGene, intgroup=c("morph"))
 ##### Loop this to plot all 20 top genes, and make a panel for the presentation ####
 top20Genes<-rownames(ddsre)[order(ddsre$padj)[1:20]]
 plotCounts(ddsdataresults, gene = top20Genes[2], intgroup = c("morph"))
-
+par(mfrow=c(3, 3))
+for(i in 1:10)
+  plotCounts(ddsdataresults, gene = top20Genes[i], intgroup = c("morph"))
 ####### Annotation result making the list of the most expressed genes  
 
 library("AnnotationDbi")
@@ -181,7 +183,7 @@ resOrderedDF2
 write.csv(resOrderedDF2, file = "resultsddsre.csv")
 
 
-
+plotMA(ddsre)
 
 
 #### Next steps!!!!! #####
@@ -216,13 +218,10 @@ Gsib_annotation_table<-readGFF("Gsib_transcriptome_draft3.gff3")
 
 ### Get names of all transcripts ###
 names(Gsib_sequences)
-seqlevels(Gsib_sequences)
-
-
+seqnames(Gsib_sequences)
 ###### Write FASTA file ####
 writeXStringSet(Gsib_sequences,"your_filename",format="fasta")
 Gsib_sequences
-
 
 
 
@@ -236,21 +235,18 @@ ranges(Gsib_annotation)
 strand(Gsib_annotation)
 length(Gsib_annotation)
 granges(Gsib_annotation)
+
 names(Gsib_sequences)
-seqlengths(Gsib_annotation)
-elementNROWS(Gsib_annotation)
+
+elementNROWS(Gsib_sequences)
 mcols(Gsib_annotation) ###### Annotation cordinates can be extracted with mcols
-mcols(Gsib_annotation)$score
+
 coverage(Gsib_annotation)
 
-
-table(seqnames(Gsib_annotation))
-
-
-elementMetadata(Gsib_annotation)
-
-Gsib_annotation[IRanges(start=c(2,7), end=c(3,9))]
+seqlengths(Gsib_annotation)
 
 
 
 
+
+      
