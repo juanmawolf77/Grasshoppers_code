@@ -67,7 +67,7 @@ mcols(ddsre, use.names=TRUE)
 library("ggrepel")
 library("ggplot2") 
 library("EnhancedVolcano")
-pdf("kallisto_est_Enhanced_VolcanoPlot_1.pdf", height = 9, width = 16)
+png("Enhanced_VolcanoPlot_1.png", height = 100, width = 100)
 EnhancedVolcano(ddsre, 
                 lab = rownames(ddsre), 
                 x="log2FoldChange", 
@@ -108,26 +108,30 @@ summary(resLFC)
 ### creating a MA-plot to see the log2fold changes 
 plotMA(resLFC, ylim = c(-15, 15))
 plotMA(ddsre, ylim = c(-15, 15))
+png("MAplotLFC_1.png", height = 10, width = 10)
 maplot = ggmaplot(resLFC, fdr = 0.01, fc = 1, size = 1,
                   palette = c("#e55c30", "#84206b", "#f6d746"),
                   genenames = as.vector(row.names(resLFC)),
                   legend="top", top = 15,font.label = c("bold", 11),
                   label.rectangle = TRUE, font.legend = c("bold",12), font.main = "bold",
                   xlab = "Log2 Mean Expression",  ylab="Log2 FC")
+
 show(maplot)
+dev.off()
 ###  
+png("Kallisto_maplot_Log2_MeanExp_vs_Log2FC.png", width = 1600, height = 1200)
 EnhancedVolcano(resLFC, 
                 lab = rownames(resLFC), 
                 x="log2FoldChange", 
                 y="padj", 
                 FCcutoff = 1.0, 
-                pCutoff =0.1,
+                pCutoff =0.8,
                 pointSize = 1.5, 
                 labSize = 3.0, 
-                ylim = c(0,15), 
-                xlim = c(-10,10),
+                ylim = c(0,10), 
+                xlim = c(-8,8),
                 colAlpha=1)
-
+dev.off()
 
 
 
@@ -145,8 +149,8 @@ pheatmap(assay(vsd)[genes, ], cluster_rows=TRUE, show_rownames=TRUE,
          cluster_cols=FALSE)
 ############### plotting the pheatmap
 library("genefilter")
-topVarGenes <- head(order(rowVars(assay(vsd)), decreasing = TRUE), 24)
-mat  <- assay(vsd)[ topVarGenes, ]
+topVarGenes <- head(order(rowVars(assay(vsd)[genes, ]), decreasing = TRUE), 20)
+mat  <- assay(vsd)[ genes, ]
 mat  <- mat - rowMeans(mat)
 anno <- as.data.frame(colData(vsd)[, c("morph","sex")])
 pheatmap(mat, annotation_col = anno)
