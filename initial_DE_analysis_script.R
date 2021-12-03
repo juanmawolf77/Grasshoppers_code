@@ -3,6 +3,9 @@
 rm(list = ls())
 library("DESeq2")
 library("tximport")  
+library("rmarkdown")
+
+render()
 
 
 ### Import kallisto pseudo-counts into memory 
@@ -31,6 +34,7 @@ nrow(ddsdata)
 ###  removing low counts 
 keep <- rowSums(counts(ddsdata)) >= 120
 ddsdatafil<- ddsdata[keep,]
+ddsdatafil$morph<-relevel(ddsdatafil$morph, ref = c("B"))
 ddsdatafil
 keep
 summary(keep)
@@ -67,12 +71,12 @@ mcols(ddsre, use.names=TRUE)
 library("ggrepel")
 library("ggplot2") 
 library("EnhancedVolcano")
-png("Enhanced_VolcanoPlot_1.png", height = 100, width = 100)
+pdf("Enhanced_VolcanoPlot_1.pdf", height = 20, width = 20)
 EnhancedVolcano(ddsre, 
                 lab = rownames(ddsre), 
                 x="log2FoldChange", 
                 y="padj", 
-                FCcutoff = 1.0, 
+                FCcutoff = 2.0, 
                 pCutoff =0.1,
                 pointSize = 1.5, 
                 labSize = 3.0, 
@@ -82,9 +86,11 @@ EnhancedVolcano(ddsre,
 dev.off()
 
 
+
 library("ggpubr")
-png("Kallisto_maplot_Log2_MeanExp_vs_Log2FC.png", width = 1600, height = 1200)
-maplot = ggmaplot(ddsre, fdr = 0.01, fc = 1, size = 1,
+pdf("Kallisto_maplot_Log2_MeanExp_vs_Log2FC.pdf", width = 1000, height = 1000)
+
+maplot = ggmaplot(ddsre, fdr = 0.01, fc = 2, size = 1,
                   palette = c("#e55c30", "#84206b", "#f6d746"),
                   genenames = as.vector(row.names(ddsre)),
                   legend="top", top = 15,font.label = c("bold", 11),
@@ -95,7 +101,10 @@ dev.off()
 
 #Dispersionplot
 ### Plot this DispEst plot into a png or pdf for presentation/publication
+pdf("Dispersionplot.pdf", width = 30, height = 30)
 plotDispEsts(ddsdataresults)
+
+dev.off()
 
 
 
@@ -108,8 +117,8 @@ summary(resLFC)
 ### creating a MA-plot to see the log2fold changes 
 plotMA(resLFC, ylim = c(-15, 15))
 plotMA(ddsre, ylim = c(-15, 15))
-png("MAplotLFC_1.png", height = 10, width = 10)
-maplot = ggmaplot(resLFC, fdr = 0.01, fc = 1, size = 1,
+pdf("MAplotLFC_1.pdf", height = 10, width = 10)
+maplot = ggmaplot(resLFC, fdr = 0.01, fc = 2, size = 1,
                   palette = c("#e55c30", "#84206b", "#f6d746"),
                   genenames = as.vector(row.names(resLFC)),
                   legend="top", top = 15,font.label = c("bold", 11),
@@ -119,13 +128,13 @@ maplot = ggmaplot(resLFC, fdr = 0.01, fc = 1, size = 1,
 show(maplot)
 dev.off()
 ###  
-png("Kallisto_maplot_Log2_MeanExp_vs_Log2FC.png", width = 1600, height = 1200)
+pdf("volcanoplotlfc.pdf", width = 20, height = 20)
 EnhancedVolcano(resLFC, 
                 lab = rownames(resLFC), 
                 x="log2FoldChange", 
                 y="padj", 
-                FCcutoff = 1.0, 
-                pCutoff =0.8,
+                FCcutoff = 2.0, 
+                pCutoff =0.1,
                 pointSize = 1.5, 
                 labSize = 3.0, 
                 ylim = c(0,10), 
@@ -150,10 +159,15 @@ pheatmap(assay(vsd)[genes, ], cluster_rows=TRUE, show_rownames=TRUE,
 ############### plotting the pheatmap
 library("genefilter")
 topVarGenes <- head(order(rowVars(assay(vsd)[genes, ]), decreasing = TRUE), 20)
+
 mat  <- assay(vsd)[ genes, ]
 mat  <- mat - rowMeans(mat)
+
 anno <- as.data.frame(colData(vsd)[, c("morph","sex")])
+pdf("pheatmap.pdf", width = 10, height = 10)
 pheatmap(mat, annotation_col = anno)
+
+dev.off()
 
 ############### the most significant gene is the transcript_84434
 topGene <- rownames(ddsre)[which.min(ddsre$padj)]
@@ -161,10 +175,12 @@ plotCounts(ddsdataresults, gene = topGene, intgroup=c("morph"))
 
 ##### Loop this to plot all 20 top genes, and make a panel for the presentation ####
 top20Genes<-rownames(ddsre)[order(ddsre$padj)[1:20]]
+pdf("top20.pdf", width = 100, height = 100)
 plotCounts(ddsdataresults, gene = top20Genes[2], intgroup = c("morph"))
 par(mfrow=c(3, 3))
-for(i in 1:10)
+for(i in 1:20)
   plotCounts(ddsdataresults, gene = top20Genes[i], intgroup = c("morph"))
+dev.off()
 ####### Annotation result making the list of the most expressed genes  
 
 library("AnnotationDbi")
@@ -187,7 +203,7 @@ resOrderedDF2
 write.csv(resOrderedDF2, file = "resultsddsre.csv")
 
 
-plotMA(ddsre)
+install.packages("rmarkdown")
 
 
 #### Next steps!!!!! #####
@@ -248,8 +264,7 @@ mcols(Gsib_annotation) ###### Annotation cordinates can be extracted with mcols
 coverage(Gsib_annotation)
 
 seqlengths(Gsib_annotation)
-
-
+n
 
 
 
